@@ -20,8 +20,8 @@ This project was created to help me practice structuring programs with functions
 - 	Python 3
 - 	VS Code
 - 	Standard library modules:
-- 	 for timestamps
-- 	File I/O (, read/write`)
+-  datetime for timestamps
+- 	File I/O (open, read/write`)
 
 
  ## Future Improvements
