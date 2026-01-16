@@ -1,4 +1,4 @@
-## Notes App (Python)
+# Notes App (Python)
 A simple command‑line notes application built using Python.
 This project was created to help me practice structuring programs with functions, working with files, and building a clean menu‑driven CLI app.
 
