@@ -7,25 +7,27 @@ This project was created to help me practice structuring programs with functions
 - 	View all saved notes
 - 	Search notes by keyword
 - 	Delete notes by selecting their number
+-   Clear all notes
+-   Improved formatting when viewing notes
 - 	Automatic file creation if notes.txt doesn’t exist
 
-
 ## How to Run
+
 1. 	Clone the repository
 2. 	No external dependencies required
 3. 	Run the app: python notes.py
 
-
 ## Tech Used
+
 - 	Python 3
 - 	VS Code
 - 	Standard library modules:
 -  datetime for timestamps
-- 	File I/O (open, read/write`)
-
+- 	File I/O (open, read, write)
 
  ## Future Improvements
-- 	Clear all notes option
-- 	Better formatting when viewing notes
+
 - 	Save notes in JSON instead of plain text
+-   Load notes from JSON
 - 	GUI version (Tkinter or PyQt)
+- 	More advanced formatting options
