@@ -4,19 +4,20 @@ This project was created to help me practice structuring programs with functions
 
  ## Features
 - 	Add notes with timestamps
-- 	View all saved notes
+-  	View all saved notes
 - 	Search notes by keyword
+-   Edit existing notes
 - 	Delete notes by selecting their number
 -   Clear all notes
 -   Improved formatting when viewing notes
-- 	Automatic file creation if notes.txt doesn’t exist
+- 	Automatic file creation if `notes.txt` doesn’t exist
 
 ## How to Run
 
 Tested with: **Python 3.12**
 
-> **Windows note: when downloading '.py' files from the internet, Windows may show a security warning.
-> This is a standard mesage for all Python scripts and not specific to this project.
+> **Windows note: when downloading `.py` files from the internet, Windows may show a security warning.
+> This is a standard message for all Python scripts and not specific to this project.**
 
 1. 	Clone the repository
 2. 	No external dependencies required
@@ -27,12 +28,14 @@ Tested with: **Python 3.12**
 - 	Python 3
 - 	VS Code
 - 	Standard library modules:
--  datetime for timestamps
-- 	File I/O (open, read, write)
+-   `datetime` for timestamps
+- 	File I/O (`open`, `read`, `write`)
 
  ## Future Improvements
 
 - 	Save notes in JSON instead of plain text
 -   Load notes from JSON
-- 	GUI version (Tkinter or PyQt)
 - 	More advanced formatting options
+-   Optional encryption
+-   freeze CLI version
+- 	GUI version with CustomTkinter
