@@ -1,16 +1,16 @@
 # Notes App (Python)
 A simple command‑line notes application built using Python.
-This project was created to help me practice structuring programs with functions, working with files, and building a clean menu‑driven CLI app.
+Supports adding, viewing, searching, editing, deleting and clearing notes. All stored in a structured JSON file.
 
  ## Features
-- 	Add notes with timestamps
--  	View all saved notes
+- 	Add notes with automatic timestamps
+-  	View all saved notes in a numbered list
 - 	Search notes by keyword
 -   Edit existing notes
 - 	Delete notes by selecting their number
 -   Clear all notes
 -   Improved formatting when viewing notes
-- 	Automatic file creation if `notes.txt` doesn’t exist
+- 	JSON storage
 
 ## How to Run
 
@@ -33,9 +33,9 @@ Tested with: **Python 3.12**
 
  ## Future Improvements
 
-- 	Save notes in JSON instead of plain text
--   Load notes from JSON
 - 	More advanced formatting options
--   Optional encryption
+-   Add optinal PIN lock for privacy
+-   Store PIN securley using hashing
+-   Encrypt notes in the future for full privacy
 -   freeze CLI version
 - 	GUI version with CustomTkinter

@@ -1,31 +1,43 @@
 from datetime import datetime
 
+import json
+
 print("Notes App Starting...")
+
+def load_notes():
+    try:
+        with open("notes.json", "r") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return [] # return empty list if file not found
+    
+def save_notes(notes):
+    with open("notes.json", "w") as file:
+        json.dump(notes, file, indent=4) # save notes list to JSON with indentation
 
 
 def add_note():
     # get note from user
 
-    note = input("write a note: ")
+    note_content = input("Write a note: ")
 
     # get current time stamp
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # save note to file with timestamp
+    notes = load_notes() # load existing notes from json
 
-    with open("notes.txt", "a") as file:
-        file.write(f"[{timestamp}] {note}\n")
+    new_entry = {"text": note_content, "timestamp": timestamp}
 
-    print("Note saved!")
+    notes.append(new_entry) # add new note to list
+    save_notes(notes) # save updated notes list to json file
+
+    print("Note added!")
 
 
 def view_notes():
     try:
-        # load notes from file
-
-        with open("notes.txt", "r") as file:
-            notes = file.readlines()
+        notes = load_notes()
 
         # check if there are notes
 
@@ -37,7 +49,7 @@ def view_notes():
 
         print("\n--- Your Notes ---")
         for i, note in enumerate(notes, start=1):
-            print(f"{i}. {note.strip()}")
+            print(f"{i}. {note['text']} ({note['timestamp']})")
         print("------------------\n")
 
     # handel notes file not found error
@@ -48,53 +60,49 @@ def view_notes():
 
 def edit_note():
     try:
-        # load notes from file
-
-        with open("notes.txt", "r") as file:
-            notes = file.readlines()
+        notes = load_notes()
 
             # stop if there are no notes
 
-            if not notes:
+        if not notes:
                 print("no notes to edit.")
                 return
 
             # diplay notes with numbers
 
-            print("\n--- Your Notes ---")
-            for i, note in enumerate(notes, start=1):
-                print(f"{i}. {note.strip()}")
+        print("\n--- Your Notes ---")
+        for i, note in enumerate(notes, start=1):
+                print(f"{i}. [{note['timestamp']}] {note['text']}")
 
             # ask user witch note to edit
 
-            choice = input("\nEnter the number of the notes to edit: ")
+        choice = input("\nEnter the number of the notes to edit: ")
 
             #  validate input
 
-            if not choice.isdigit():
+        if not choice.isdigit():
                 print("Invalid choice.")
                 return
 
-            index = int(choice) - 1
+        index = int(choice) - 1
 
             # check if number is in range
 
-            if index < 0 or index >= len(notes):
+        if index < 0 or index >= len(notes):
                 print("Note number out of range. ")
                 return
 
             # get new text from user
 
-            new_text = input("Enter the new text for the note: ")
+        new_text = input("Enter the new text for the note: ").strip()
 
             # replace selected note
 
-            notes[index] = new_text + "\n"
+        notes[index]["text"] = new_text
 
-        # save updated notes back to file
+        # save updated notes back to JSON
 
-        with open("notes.txt", "w") as file:
-            file.writelines(notes)
+        save_notes(notes)
 
         print("Note updated successfuly.")
 
@@ -105,22 +113,19 @@ def edit_note():
 def search_notes():
     # get search term from user
 
-    term = input("Search for: ")
+    term = input("Search for: ").strip()
     print("\nSearch results:")
 
     try:
-        # load notes from file
-
-        with open("notes.txt", "r") as file:
-            notes = file.readlines()
-            found = False
+        notes = load_notes()
+        found = False
 
             # search for term in notes
 
-            for n in notes:
-                if term.lower() in n.lower():
-                    print("- " + n.strip())
-                    found = True
+        for n in notes:
+            if term.lower() in n["text"].lower():
+                 print(f"- {n['text']} ({n['timestamp']})")
+                 found = True
 
             # if no matches found
 
@@ -136,42 +141,39 @@ def search_notes():
 def delete_note():
     print("\nDelete a note:")
     try:
-        # load notes from file
-
-        with open("notes.txt", "r") as file:
-            notes = file.readlines()
+        notes = load_notes()
 
             # check if there are notes
 
-            if not notes:
+        if not notes:
                 print("No notes to delete.")
                 return
 
             # display notes with numbers
-
-            for i, n in enumerate(notes, start=1):
-                print(f"{i}. {n.strip()}")
-            num = input("Enter the number of the note to delete: ")
+        print("\n--- Your Notes ---")
+        for i, n in enumerate(notes, start=1):
+                print(f"{i}. {n['text']} ({n['timestamp']})")
+        
+        num = input("Enter the number of the note to delete: ")
 
             # validate input
 
-            if not num.isdigit() or int(num) < 1 or int(num) > len(notes):
+        if not num.isdigit() or int(num) < 1 or int(num) > len(notes):
                 print("Invalid choice.")
                 return
 
             # delete selected note
 
-            index = int(num) - 1
-            deleted_note = notes.pop(index)
+        index = int(num) - 1
+        deleted_note = notes.pop(index)
 
-            # save updated notes back to file
+            # save updated notes back to JSON
 
-            with open("notes.txt", "w") as file:
-                file.writelines(notes)
+        save_notes(notes)
+                
+            # confirm deletion to user
 
-            # confirm selection
-
-            print(f"Deleted: {deleted_note.strip()}")
+        print(f"Deleted: {deleted_note['text']} ({deleted_note['timestamp']})")
 
         # handel file not found error
 
@@ -187,8 +189,8 @@ def clear_all_notes():
     # if yes delete all notes
 
     if confirm == "y":
-        with open("notes.txt", "w") as file:
-            file.write("")  # overwrite with nothing
+        save_notes([]) # overwrite JSON with empty list
+        
         print("All notes have been cleared.")
 
     # if no cancel
