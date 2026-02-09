@@ -34,7 +34,7 @@ Tested with: **Python 3.12**
  ## Future Improvements
 
 - 	More advanced formatting options
--   Add optinal PIN lock for privacy
+-   Add optional PIN lock for privacy
 -   Store PIN securley using hashing
 -   Encrypt notes in the future for full privacy
 -   freeze CLI version
