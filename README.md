@@ -3,7 +3,7 @@ A simple command‑line notes application built using Python.
 Supports adding, viewing, searching, editing, deleting and clearing notes. All stored in a structured JSON file with unique IDs.
 Now includes a secure PIN lock using salted SHA-256 hashing.
 
-## Features
+# Features
 
  ## Security
 - 	PIN‑protected access
@@ -28,11 +28,13 @@ Now includes a secure PIN lock using salted SHA-256 hashing.
 
 ## file structure
 
+```
 project/
 │
 ├── notes.json      # Created automatically when notes are saved
 ├── pin.json        # Created automatically on first run (stores hashed PIN)
 └── notes.py        # Main application
+```
 
 ## How to Run
 
