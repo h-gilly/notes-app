@@ -2,13 +2,81 @@ from datetime import datetime
 
 import json
 
+import hashlib
+
 print("Notes App Starting...")
+
+SALT = "raccoon_city_1998"
+
+
+def hash_pin(pin):
+    return hashlib.sha256((pin + SALT).encode()).hexdigest()
+
+
+def setup_pin():
+    try:
+        with open("pin.json", "r") as f:
+            data = json.load(f)
+            if "pin_hash" in data:
+                return
+    except FileNotFoundError:
+        pass
+
+    pin = input("Create a PIN: ").strip()
+    with open("pin.json", "w") as f:
+        json.dump({"pin_hash": hash_pin(pin)}, f, indent=4)
+    print("PIN created!")
+
+
+def login():
+    try:
+        with open("pin.json", "r") as f:
+            data = json.load(f)
+            stored_hash = data["pin_hash"]
+    except FileNotFoundError:
+        print("PIN file missing.")
+        return False
+
+    for _ in range(3):
+        pin = input("Enter PIN:").strip()
+        if hash_pin(pin) == stored_hash:
+            print("Access granted.")
+            return True
+        print("Incorrect PIN.")
+
+    print("Too many failed attempts. Exiting.")
+    return False
+
+
+def change_pin():
+    try:
+        with open("pin.json", "r") as f:
+            data = json.load(f)
+            stored_hash = data["pin_hash"]
+    except FileNotFoundError:
+        print("PIN file missing.")
+        return
+
+    current = input("Enter current PIN:").strip()
+    if hash_pin(current) != stored_hash:
+        print("Incorrect PIN.")
+        return
+
+    new_pin = input("Enter new PIN:").strip()
+    with open("pin.json", "w") as f:
+        json.dump({"pin_hash": hash_pin(new_pin)}, f, indent=4)
+    print("PIN changed successfully.")
+
+
+setup_pin()
+if not login():
+    exit()
 
 
 def load_notes():
     try:
         with open("notes.json", "r") as file:
-            return json.load(file)
+            notes = json.load(file)
 
         for n in notes:
             if "last_modified" not in n:
@@ -205,7 +273,8 @@ def show_menu():
     print("4. Search notes")
     print("5. Delete a note")
     print("6. Delete all notes")
-    print("7. Exit")
+    print("7. Change PIN")
+    print("8. Exit")
 
 
 while True:
@@ -232,6 +301,9 @@ while True:
         clear_all_notes()
 
     elif choice == "7":
+        change_pin()
+
+    elif choice == "8":
         print("Goodbye!")
         break
 
