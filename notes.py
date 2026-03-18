@@ -2,29 +2,53 @@ from datetime import datetime
 
 import json
 
+import uuid
+
+import os
+
 import hashlib
+
+import binascii
 
 print("Notes App Starting...")
 
-SALT = "raccoon_city_1998"
+PBKDF2_ITERATIONS = 600000
 
 
-def hash_pin(pin):
-    return hashlib.sha256((pin + SALT).encode()).hexdigest()
+def hash_new_pin(pin):
+    salt = os.urandom(16)
+    hashed = hashlib.pbkdf2_hmac("sha256", pin.encode(), salt, PBKDF2_ITERATIONS)
+    return salt, hashed
+
+
+def verify_pin(stored_salt, stored_hash, input_pin):
+    new_hash = hashlib.pbkdf2_hmac(
+        "sha256", input_pin.encode(), stored_salt, PBKDF2_ITERATIONS
+    )
+    return new_hash == stored_hash
 
 
 def setup_pin():
     try:
         with open("pin.json", "r") as f:
             data = json.load(f)
-            if "pin_hash" in data:
+            if "hash" in data:
                 return
     except FileNotFoundError:
         pass
 
     pin = input("Create a PIN: ").strip()
+    salt, hashed = hash_new_pin(pin)
+
+    auth_data = {
+        "salt": binascii.hexlify(salt).decode(),
+        "hash": binascii.hexlify(hashed).decode(),
+        "iterations": PBKDF2_ITERATIONS,
+    }
+
     with open("pin.json", "w") as f:
-        json.dump({"pin_hash": hash_pin(pin)}, f, indent=4)
+        json.dump(auth_data, f, indent=4)
+
     print("PIN created!")
 
 
@@ -32,14 +56,15 @@ def login():
     try:
         with open("pin.json", "r") as f:
             data = json.load(f)
-            stored_hash = data["pin_hash"]
+            stored_salt = binascii.unhexlify(data["salt"])
+            stored_hash = binascii.unhexlify(data["hash"])
     except FileNotFoundError:
         print("PIN file missing.")
         return False
 
     for _ in range(3):
         pin = input("Enter PIN:").strip()
-        if hash_pin(pin) == stored_hash:
+        if verify_pin(stored_salt, stored_hash, pin):
             print("Access granted.")
             return True
         print("Incorrect PIN.")
@@ -52,19 +77,28 @@ def change_pin():
     try:
         with open("pin.json", "r") as f:
             data = json.load(f)
-            stored_hash = data["pin_hash"]
+            stored_salt = binascii.unhexlify(data["salt"])
+            stored_hash = binascii.unhexlify(data["hash"])
     except FileNotFoundError:
         print("PIN file missing.")
         return
 
     current = input("Enter current PIN:").strip()
-    if hash_pin(current) != stored_hash:
+    if not verify_pin(stored_salt, stored_hash, current):
         print("Incorrect PIN.")
         return
 
     new_pin = input("Enter new PIN:").strip()
+    new_salt, new_hash = hash_new_pin(new_pin)
+
+    auth_data = {
+        "salt": binascii.hexlify(new_salt).decode(),
+        "hash": binascii.hexlify(new_hash).decode(),
+        "iterations": PBKDF2_ITERATIONS,
+    }
+
     with open("pin.json", "w") as f:
-        json.dump({"pin_hash": hash_pin(new_pin)}, f, indent=4)
+        json.dump(auth_data, f, indent=4)
     print("PIN changed successfully.")
 
 
@@ -81,16 +115,6 @@ def load_notes():
         for n in notes:
             if "last_modified" not in n:
                 n["last_modified"] = None
-            if "id" not in n:
-                n["id"] = None
-
-        next_id = 1
-        for n in notes:
-            if n.get("id") is None:
-                n["id"] = next_id
-                next_id += 1
-            else:
-                next_id = max(next_id, n["id"] + 1)
 
         return notes
 
@@ -103,12 +127,6 @@ def save_notes(notes):
         json.dump(notes, file, indent=4)
 
 
-def generate_id(notes):
-    if not notes:
-        return 1
-    return max(n["id"] for n in notes) + 1
-
-
 def add_note():
 
     note_content = input("Write a note: ")
@@ -116,7 +134,7 @@ def add_note():
     notes = load_notes()
 
     new_note = {
-        "id": generate_id(notes),
+        "id": str(uuid.uuid4()),
         "text": note_content,
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "last_modified": None,
@@ -162,20 +180,18 @@ def edit_note():
             if n.get("last_modified"):
                 print(f"  Last modified: {n['last_modified']}")
 
-        choice = input("\nEnter the ID of the note to edit: ")
+        choice = input("\nEnter the number of the note to edit: ").strip()
 
         if not choice.isdigit():
-            print("Invalid ID.")
+            print("Invalid choice.")
             return
 
-        note_id = int(choice)
-
-        note = next((n for n in notes if n["id"] == note_id), None)
-
-        if not note:
-            print("No note found with that ID.")
+        index = int(choice) - 1
+        if index < 0 or index >= len(notes):
+            print("No note found with that number.")
             return
 
+        note = notes[index]
         new_text = input("Enter the new text for the note: ").strip()
 
         note["text"] = new_text
@@ -228,19 +244,18 @@ def delete_note():
             if n.get("last_modified"):
                 print(f"  Last modified: {n['last_modified']}")
 
-        num = input("\nEnter the ID of the note to delete: ")
+        choice = input("\nEnter the number of the note to delete: ").strip()
 
-        if not num.isdigit():
-            print("Invalid ID.")
+        if not choice.isdigit():
+            print("Invalid choice.")
             return
 
-        note_id = int(num)
-
-        note = next((n for n in notes if n["id"] == note_id), None)
-
-        if not note:
-            print("No note found with that ID.")
+        index = int(choice) - 1
+        if index < 0 or index >= len(notes):
+            print("No note found with that number.")
             return
+
+        note = notes[index]
 
         notes.remove(note)
         save_notes(notes)
