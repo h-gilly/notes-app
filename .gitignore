@@ -1,0 +1,6 @@
+notes.json
+pin.json
+__pycache__/
+*.pyc
+
+.vscode/
