@@ -15,11 +15,13 @@ Now includes a secure PIN lock using PBKDF2‑HMAC‑SHA256 with a random salt a
 - 3 attempts before exit
 - Change PIN at any time
 - PIN stored securely using  PBKDF2‑HMAC‑SHA256
+- Timing-safe comparison using hmac.compare_digest()
 - Random 16‑byte salt + 600,000 iterations
 
 ### Notes Management
 
 - Add notes with automatic timestamps
+- Add multiple notes in one session without returning to the menu
 - Each note has a  UUID4 unique ID
 - Edit and delete notes using simple number‑based selection
 - View all notes in a clean formatted list
