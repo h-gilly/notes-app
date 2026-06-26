@@ -37,12 +37,21 @@ Now includes a secure PIN lock using PBKDF2‑HMAC‑SHA256 with a random salt a
 
 ### File structure
 
-```
+```code
 project/
 │
-├── notes.json      # Created automatically when notes are saved
-├── pin.json        # Created automatically on first run (stores hashed PIN)
-└── notes.py        # Main application
+├── main.py
+│
+├── src/
+│   ├── __init__.py
+│   ├── menu.py
+│   ├── notes.py
+│   └── storage.py
+│
+└── cryptography/
+    ├── __init__.py
+    └── security.py
+
 ```
 
 ## How to Run
