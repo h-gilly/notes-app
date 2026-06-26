@@ -48,7 +48,7 @@ project/
 │   ├── notes.py
 │   └── storage.py
 │
-└── cryptography/
+└── crypto_utils/
     ├── __init__.py
     └── security.py
 
