@@ -7,7 +7,7 @@ from src.notes import (
     clear_all_notes
 )
 
-from cryptography.security  import change_pin
+from crypto_utils.security  import change_pin
 
 def show_menu():
     print("1. Add a note")
